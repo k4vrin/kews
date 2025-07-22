@@ -6,70 +6,6 @@ modular architecture for Android, iOS.
 
 ---
 
-## Architecture Overview
-
-This project implements Clean Architecture, emphasizing separation of concerns, scalability, and
-testability. Below are high-level architectural diagrams using [Mermaid](https://mermaid.js.org/).
-
-### High-Level Architecture
-
-```mermaid
-flowchart TD
-  User((User))
-  UI[Compose UI Layer]
-  VM[Presentation Layer (ViewModels)]
-  UC[Domain Layer (Use Cases)]
-  REPO[Data Layer (Repositories)]
-  API[Network/API Service]
-  DB[(Database / Caching)]
-  NewsAPI((NewsAPI.org))
-
-  User --> UI
-  UI --> VM
-  VM --> UC
-  UC --> REPO
-  REPO --> API
-  REPO --> DB
-  API --> NewsAPI
-```
-
-### Modules & Data Flow
-
-```mermaid
-graph LR
-  subgraph Presentation
-    A1[compose-ui]
-    A2[presentation-decompose]
-    A3[presentation-voyager]
-  end
-
-  subgraph Domain
-    B1[domain/news]
-    B2[domain/auth]
-    B3[domain/rss]
-  end
-
-  subgraph Data
-    C1[data/news]
-    C2[data/auth]
-    C3[data/rss]
-    C4[core/network]
-    C5[core/database]
-    C6[core/settings]
-  end
-
-  A1 --> B1
-  A2 --> B1
-  A3 --> B1
-  B1 --> C1
-  C1 --> C4
-  C1 --> C5
-
-  C4 -- fetch --> NewsAPI((NewsAPI.org))
-```
-
----
-
 ## Quick Start
 
 ### Prerequisites
@@ -158,6 +94,28 @@ If the `.configs/main/.secrets/` directory doesn't exist, create it manually. En
 - **Data Layer**: APIs, repositories, DTOs, data sources
 - **Presentation Layer**: Compose screens, ViewModels, DI
 - **Core Utilities**: Network, database, platform-specific
+
+### Detailed Architecture Diagram
+
+```mermaid
+flowchart LR
+  User(("👤 User"))
+  ComposeUI["📱 compose-ui"]
+  VM["🛠️ presentation-decompose<br/>🛠️ presentation-voyager"]
+  UC["⚙️ domain/news<br/>⚙️ domain/auth<br/>⚙️ domain/rss"]
+  Repo["🏠 data/news<br/>🏠 data/auth<br/>🏠 data/rss"]
+  CoreNet["🌐 core/network<br/>🔑 NEWS_API_KEY via DI"]
+  CoreDB["💾 core/database"]
+  NewsAPI(("🔗 NewsAPI.org"))
+
+  User --> ComposeUI
+  ComposeUI --> VM
+  VM --> UC
+  UC --> Repo
+  Repo --> CoreNet
+  Repo --> CoreDB
+  CoreNet --> NewsAPI
+```
 
 ---
 
