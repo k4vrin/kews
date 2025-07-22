@@ -1,172 +1,184 @@
-# Kotlin Multiplatform News App
+# Kews: Kotlin Multiplatform News App
 
-A modern Kotlin Multiplatform application showcasing Clean Architecture principles with a news articles feature. The app demonstrates best practices for building cross-platform applications that run on both Android and iOS.
+A modern cross-platform news application built with Kotlin Multiplatform, Clean Architecture, and
+Compose Multiplatform UI. Powered by NewsAPI.org, Kews showcases best practices and a scalable,
+modular architecture for Android, iOS.
 
-## Features
-
--   **Kotlin Multiplatform**: Shared business logic across Android and iOS
--   **Clean Architecture**: Modularized into domain, data, and presentation layers
--   **Jetpack Compose**: Modern declarative UI for both platforms
--   **Ktor**: HTTP client for API communication
--   **Koin**: Dependency injection framework
--   **News API**: Real-time news articles from NewsAPI.org
--   **Decompose**: Navigation and state management
+---
 
 ## Architecture Overview
 
-The project follows Clean Architecture principles with the following structure:
+This project implements Clean Architecture, emphasizing separation of concerns, scalability, and
+testability. Below are high-level architectural diagrams using [Mermaid](https://mermaid.js.org/).
 
+### High-Level Architecture
+
+```mermaid
+flowchart TD
+  User((User))
+  UI[Compose UI Layer]
+  VM[Presentation Layer (ViewModels)]
+  UC[Domain Layer (Use Cases)]
+  REPO[Data Layer (Repositories)]
+  API[Network/API Service]
+  DB[(Database / Caching)]
+  NewsAPI((NewsAPI.org))
+
+  User --> UI
+  UI --> VM
+  VM --> UC
+  UC --> REPO
+  REPO --> API
+  REPO --> DB
+  API --> NewsAPI
 ```
-shared/
-├── core/
-│   └── domain/
-│       └── result/          # Result wrapper for error handling
-├── features/
-│   └── news/
-│       ├── domain/          # Business logic and models
-│       ├── data/            # Data layer (API, repositories)
-│       └── presentation/    # ViewModels and components
-├── di/                      # Dependency injection modules
-└── root/                    # Root navigation and components
 
-compose-ui/
-├── news/                    # News feature UI screens
-├── root/                    # Root navigation UI
-└── ...                      # Other UI components
+### Modules & Data Flow
+
+```mermaid
+graph LR
+  subgraph Presentation
+    A1[compose-ui]
+    A2[presentation-decompose]
+    A3[presentation-voyager]
+  end
+
+  subgraph Domain
+    B1[domain/news]
+    B2[domain/auth]
+    B3[domain/rss]
+  end
+
+  subgraph Data
+    C1[data/news]
+    C2[data/auth]
+    C3[data/rss]
+    C4[core/network]
+    C5[core/database]
+    C6[core/settings]
+  end
+
+  A1 --> B1
+  A2 --> B1
+  A3 --> B1
+  B1 --> C1
+  C1 --> C4
+  C1 --> C5
+
+  C4 -- fetch --> NewsAPI((NewsAPI.org))
 ```
 
-## Tech Stack
+---
 
-### Core Technologies
-
--   **Kotlin Multiplatform**: 2.2.0
--   **Compose Multiplatform**: 1.8.1
--   **Decompose**: 3.4.0-alpha02 (Navigation & State Management)
-
-### Networking
-
--   **Ktor**: HTTP client for API calls
--   **Kotlin Serialization**: JSON serialization
-
-### Dependency Injection
-
--   **Koin**: Lightweight DI framework
-
-### UI
-
--   **Jetpack Compose**: Android UI
--   **Compose Multiplatform**: iOS UI
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
--   **Android Studio**: Latest stable version
--   **Xcode**: 15.0+ (for iOS development)
--   **Kotlin Multiplatform Mobile Plugin**: Optional but recommended
+- **Android Studio** (latest stable, for Android/Desktop)
+- **Xcode** (15+, for iOS)
+- **Kotlin Multiplatform Mobile Plugin** (recommended)
+- **Java 17 or higher**
 
-### API Setup
+### 1. Get NewsAPI Key
 
-1. Get a free API key from [NewsAPI.org](https://newsapi.org/)
-2. Replace `YOUR_NEWS_API_KEY_HERE` in:
-    - `app-android/src/main/kotlin/com/example/myapplication/android/MainActivity.kt`
-    - `app-ios-compose/app-ios-compose/iOSApp.swift`
+- Register for a free API key at [NewsAPI.org](https://newsapi.org/).
 
-### Running the App
+### 2. Configure Your API Key
+
+Locate (or create) the file:
+
+```
+.configs/main/.secrets/secrets.properties
+```
+
+Add the following line (replace with your actual key):
+
+```
+news_api_key = <YOUR_NEWSAPI_KEY>
+```
+
+If the `.configs/main/.secrets/` directory doesn't exist, create it manually. Ensure
+`secrets.properties` is **NOT** tracked by version control (add it to `.gitignore` if needed).
+
+### 3. Build & Run
 
 #### Android
 
-1. Open the project in Android Studio
-2. Select `app-android` configuration
-3. Run the app
+1. Open the project in Android Studio.
+2. Select the `app-android` run configuration.
+3. Run on your device or emulator.
 
 #### iOS
 
-1. Open `app-ios-compose/app-ios-compose.xcodeproj` in Xcode
-2. Select a simulator or device
-3. Run the app
+1. In a terminal, run `./gradlew :umbrella:syncFramework` to generate iOS frameworks.
+2. Open `kews-ios/kews-ios.xcodeproj` in Xcode.
+3. Select a simulator or device, then build/run.
 
-#### Desktop (Optional)
+#### Desktop (optional)
 
-```bash
-./gradlew :app-desktop:run
 ```
+./gradlew :app-android:desktop:run
+```
+
+---
+
+## Tech Stack
+
+- **Kotlin Multiplatform (KMP)** – shared logic across platforms
+- **Compose Multiplatform** – UI for Android/iOS/Desktop
+- **Ktor** – networking
+- **Koin** – dependency injection
+- **BuildKonfig** – build config injection (API keys, settings)
+- **Coil** – image loading
+- **Decompose** – navigation & state
+- **SQLDelight** *(future)* – offline cache
+
+---
 
 ## Project Structure
 
-### Shared Module
+```bash
+├── app-android/               # Android app
+├── compose-ui/                # Shared Compose UIs
+├── core/                      # Shared core logic (network, db, settings)
+├── data/                      # Data repositories & sources
+├── domain/                    # Use cases & domain models
+├── umbrella/                  # Shared umbrella module (entry point)
+├── presentation-decompose/    # Navigation, ViewModels
+├── util/                      # Utilities
+├── kews-ios/                  # iOS app
+└── .configs/main/.secrets/    # (your API keys – not committed)
+```
 
-Contains all shared business logic, models, and components:
-
--   **Domain Layer**: Pure Kotlin business logic
--   **Data Layer**: API services and repositories
--   **Presentation Layer**: ViewModels and components
--   **DI Configuration**: Koin modules setup
-
-### Compose UI Module
-
-Contains all UI components shared between platforms:
-
--   **News Screens**: List and detail views
--   **Navigation**: Root navigation setup
--   **Theme**: Material Design 3 theming
-
-### Platform-Specific Modules
-
--   **app-android**: Android-specific configuration
--   **app-ios-compose**: iOS-specific configuration
-
-## Features Implemented
-
-### News Feature
-
--   **Top Headlines**: Browse latest news articles
--   **Search**: Search for specific news topics
--   **Article Details**: View full article content
--   **Error Handling**: Proper error states and loading indicators
--   **Image Loading**: Async image loading with Coil
+---
 
 ## Clean Architecture Layers
 
-### Domain Layer
+- **Domain Layer**: Business logic, models, use cases
+- **Data Layer**: APIs, repositories, DTOs, data sources
+- **Presentation Layer**: Compose screens, ViewModels, DI
+- **Core Utilities**: Network, database, platform-specific
 
--   **Models**: Pure Kotlin data classes
--   **Use Cases**: Business logic operations
--   **Repositories**: Interface definitions
+---
 
-### Data Layer
+## Features
 
--   **API Service**: Ktor-based HTTP client
--   **Repository Implementation**: Concrete implementations
--   **DTOs**: Data transfer objects
+- Browse top news headlines and search topics
+- Article detail with full content, images, source info
+- Open article in browser
+- Share article link
+- Modern Material 3 UI for all platforms
+- Proper error/loading states
 
-### Presentation Layer
+---
 
--   **ViewModels**: State management
--   **Components**: Decompose navigation components
--   **UI**: Compose-based screens
+## Testing & Future Enhancements
 
-## Testing
+- Unit tests and integration tests supported (sample tests may be added)
+- Planned: offline mode, push notifications, bookmarks, advanced search filters
 
-While tests are not required for this showcase, the architecture supports:
-
--   Unit tests for use cases
--   Integration tests for repositories
--   UI tests for Compose screens
-
-## Future Enhancements
-
--   Offline caching with SQLDelight
--   Push notifications
--   Bookmark/favorite articles
--   Dark theme support
--   Advanced search filters
--   Category-based browsing
-
-## Contributing
-
-This is a showcase project demonstrating Kotlin Multiplatform capabilities. Feel free to use it as a reference for your own projects.
+---
 
 ## License
 
-This project is provided as-is for educational and demonstration purposes.
+Educational/demonstration purposes only. See [LICENSE](LICENSE).
