@@ -46,15 +46,9 @@ If the `.configs/main/.secrets/` directory doesn't exist, create it manually. En
 
 #### iOS
 
-1. In a terminal, run `./gradlew :umbrella:syncFramework` to generate iOS frameworks.
-2. Open `kews-ios/kews-ios.xcodeproj` in Xcode.
-3. Select a simulator or device, then build/run.
 
-#### Desktop (optional)
-
-```
-./gradlew :app-android:desktop:run
-```
+1. Open `kews-ios/kews-ios.xcodeproj` in Xcode.
+2. Select a simulator or device, then build/run.
 
 ---
 
@@ -133,7 +127,7 @@ flowchart LR
 ## Testing & Future Enhancements
 
 - Unit tests and integration tests supported (sample tests may be added)
-- Planned: offline mode, push notifications, bookmarks, advanced search filters
+- Planned: offline mode, push notifications, bookmarks, advanced search filters, ai summarization, RSS feeds
 
 ---
 
